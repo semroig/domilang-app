@@ -1,0 +1,23 @@
+body {
+    padding: 10px;
+    background-color: blanchedalmond;
+}
+
+input {
+    display: block;
+}
+
+select {
+    display: block;
+}
+
+.barra {
+    display:flex;
+}
+
+.menu {
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: auto;
+    margin-right: 100px;
+}

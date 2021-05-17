@@ -1,0 +1,26 @@
+{% extends "domilang/layout.html" %}
+
+{% block body %}
+
+    <h2>Welcome to your profile!</h2>
+
+    <div>
+        {% if user.is_authenticated %}
+            <p>Your first name is <strong>{{ user.first_name }}</strong>.</p>
+            <p>Your last name is <strong>{{ user.last_name }}</strong>.</p>
+            <p>Your email is <strong>{{ user.email }}</strong>.</p>
+            <p>Your native language is <strong>{{ user.native_lan }}</strong>.</p>
+            <p>Your picture url is <strong>{{ user.foto }}</strong>.</p>
+            <p>Your country is <strong>{{ user.pais }}</strong>.</p>
+            <p>Your time zone is <strong>{{ user.franja }}</strong>.</p>
+            <p>Your level is <strong>{{ user.nivel }}</strong>.</p>
+            <p>Your study language is <strong>{{ user.study_lan }}</strong>.</p>
+            <p>Your phone is <strong>{{ user.phone }}</strong>.</p>
+        {% else %}
+            Not signed in.
+        {% endif %}
+    </div>
+
+    <a href="{% url 'domilang:edit' %}">Edit Profile</a>
+
+{% endblock %}

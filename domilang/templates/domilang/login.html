@@ -1,0 +1,14 @@
+{% extends "domilang/layout.html" %}
+
+{% block body %}
+
+    <h2>Log in page</h2>
+    <form method="post">
+        {% csrf_token %}
+
+        {{ form }}
+
+        <input type="submit">
+    </form>
+
+{% endblock %}
