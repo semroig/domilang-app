@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth import authenticate, login, logout
 
-from .models import User
+from .models import StudyModule, User
 from django.db import IntegrityError
 
 from .forms import LogInForm
@@ -18,26 +18,18 @@ def index(request):
 
 def login_view(request):
     if request.method == "POST":
-        form = LogInForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data["username"]
-            password = form.cleaned_data["password"]
-            user = authenticate(request, username=username, password=password)
-            if user is not None:
-                login(request, user)
-                return HttpResponseRedirect(reverse("domilang:home"))
-            else:
-                return render(request, "domilang/login.html", {
-                    "message": "Invalid credentials.",
-                    "form": LogInForm()
-                })
+        email = request.POST["email"]
+        password = request.POST["password"]
+        user = authenticate(request, username=email, password=password)
+        if user is not None:
+            login(request, user)
+            return HttpResponseRedirect(reverse("domilang:home"))
         else:
-            return render(request, "domilang/login.html", {
-                "form": form
+            return render(request, "domilang/login.html",{
+                "message": "Invalid credentials."
             })
-    return render(request, "domilang/login.html", {
-        "form": LogInForm()
-    })
+    else:
+        return render(request, "domilang/login.html")
 
 def logout_view(request):
     logout(request)
@@ -54,55 +46,49 @@ def home(request):
 
 def register(request):
     if request.method == "POST":
-        form = RegisterForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data["username"]
-            email = form.cleaned_data["email"]
-
-            # Ensure password matches confirmation
-            password = form.cleaned_data["password"]
-            confirmation = form.cleaned_data["confirmation"]
-            if password != confirmation:
-                return render(request, "domilang/register.html", {
-                    "message": "Passwords must match."
-                })
-            # Attempt to create new user
-            try:
-                user = User.objects.create_user(username, email, password)
-                user.save()
-            except IntegrityError:
-                return render(request, "domilang/register.html", {
-                    "message": "Username already taken."
-                })
-            login(request, user)
-            return HttpResponseRedirect(reverse("domilang:home"))
-        else:
-            return render(request, "domilang/register.html",{
-                "form": form
+        email = request.POST["email"]
+        username = email
+        # Ensure password matches confirmation
+        password = request.POST["password"]
+        confirmation = request.POST["confirmation"]
+        if password != confirmation:
+            return render(request, "domilang/register.html", {
+                "message": "Passwords must match."
             })
+        # Attempt to create new user
+        try:
+            user = User.objects.create_user(username, email, password)
+            user.save()
+        except IntegrityError:
+            return render(request, "domilang/register.html", {
+                "message": "Username already taken."
+            })
+        login(request, user)
+        return HttpResponseRedirect(reverse("domilang:home"))
     else:
-        return render(request, "domilang/register.html", {
-        "form": RegisterForm()
-    })
+        return render(request, "domilang/register.html")
 
 def edit(request):
     if request.method == 'POST':
-        form = ProfileForm(request.POST)
+        form = ProfileForm(request.POST, request.FILES)
         if form.is_valid():
             first_name = form.cleaned_data['first_name']
             last_name = form.cleaned_data['last_name']
             language = form.cleaned_data['native_lan']
-            foto = form.cleaned_data['foto']
+            
             pais = form.cleaned_data['pais']
             franja = form.cleaned_data['franja']
             nivel = form.cleaned_data['nivel']
             study_lan = form.cleaned_data['study_lan']
             phone = form.cleaned_data['phone']
+            if form.cleaned_data['foto']:
+                foto = form.cleaned_data['foto']
+                request.user.foto = foto
 
             request.user.first_name = first_name
             request.user.last_name = last_name
             request.user.native_lan = language
-            request.user.foto = foto
+            
             request.user.pais = pais
             request.user.franja = franja
             request.user.nivel = nivel
@@ -129,3 +115,34 @@ def edit(request):
                 'phone': request.user.phone
             })
         })
+
+def inbox(request):
+    return render(request, "domilang/inbox.html")
+
+def inroll(request):
+    profes = User.objects.filter(role="Teacher")
+    return render(request, "domilang/inroll.html",{
+        "profes": profes
+    })
+
+def material(request):
+    usuario = request.user
+    modules = usuario.homework.all()
+    return render(request, "domilang/material.html",{
+        "modules": modules
+    })
+
+def module(request, module_id):
+    module = StudyModule.objects.get(id=module_id)
+    return render(request, "domilang/module.html",{
+        "module": module
+    })
+
+def navbar(request):
+    return render(request, "domilang/navbar.html")  
+
+def payments(request):
+    if not request.user.is_authenticated:
+        return render(request, "domilang/extranger.html")
+    else:
+        return render(request, "domilang/payments.html")

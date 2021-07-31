@@ -4,8 +4,9 @@
 
     <h2>Welcome to your profile!</h2>
 
-    <div>
+    <div class="col-md-6 col-xs-12">
         {% if user.is_authenticated %}
+            <img src="{{ user.foto.url }}" alt="Your pic" width="200" class="foto-perfil">
             <p>Your first name is <strong>{{ user.first_name }}</strong>.</p>
             <p>Your last name is <strong>{{ user.last_name }}</strong>.</p>
             <p>Your email is <strong>{{ user.email }}</strong>.</p>
@@ -22,5 +23,33 @@
     </div>
 
     <a href="{% url 'domilang:edit' %}">Edit Profile</a>
+
+    <hr>
+
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card text-center">
+                <div class="card-body">
+                    <img class="foto-perfil" src="{{ user.foto.url }}" alt="Your pic" width="65">
+                    
+                    <strong>{{ user.first_name }} {{ user.last_name }}</strong>
+                    <br>
+                    {{ user.study_lan }} learner.
+                    <br>
+                    <small>{{ user.pais }}</small>
+                   
+                    
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                  This is some text within a card body.
+                </div>
+            </div>
+        </div>
+    </div>
+    
 
 {% endblock %}
